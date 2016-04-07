@@ -82,3 +82,24 @@ func (e *Entity) ComponentFast(c Component) interface{} {
 func (e *Entity) ID() string {
 	return e.id
 }
+
+// Duplicate populates an array with the specified amounts of clones from an Entity.
+// NOTE: If you provide your components as pointers, the pointer will be duplicated.
+// Hence, the entities will "share" a component.
+func (e Entity) Duplicate(amount int) []Entity {
+	var es []Entity
+
+	for i := 0; i < amount; i++ {
+		es = append(es, e.Clone())
+	}
+
+	return es
+}
+
+// Clone creates a duplication of an entity.
+func (e Entity) Clone() Entity {
+	clone := e
+	clone.id = generateUUID()
+
+	return clone
+}

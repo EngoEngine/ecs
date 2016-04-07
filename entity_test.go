@@ -53,6 +53,26 @@ func (g *getComponentSystem) UpdateEntity(entity *Entity, dt float32) {
 	}
 }
 
+func TestDuplication(t *testing.T) {
+	e := NewEntity([]string{})
+	amount := 20
+
+	es := e.Duplicate(amount)
+
+	if amount != len(es) {
+		t.Errorf("Not same amount of entities %v %v", amount, len(es))
+	}
+}
+
+func TestClone(t *testing.T) {
+	e := NewEntity([]string{})
+	e2 := e.Clone()
+
+	if e.ID() == e2.ID() {
+		t.Error("IDs are the same :/ (a statistical anomaly may have occurred.)")
+	}
+}
+
 func BenchmarkComponent(b *testing.B) {
 	preload := func() {}
 	setup := func(w *World) {
