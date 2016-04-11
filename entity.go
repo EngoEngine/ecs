@@ -20,7 +20,7 @@ type Entity struct {
 
 // NewEntity creates a new Entity given an array of Systems which should be
 // required
-func NewEntity(requires []string) *Entity {
+func NewEntity(requires ...string) *Entity {
 	e := &Entity{
 		id:         generateUUID(),
 		requires:   make(map[string]bool),

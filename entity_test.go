@@ -58,7 +58,7 @@ func BenchmarkComponent(b *testing.B) {
 	setup := func(w *World) {
 		w.AddSystem(&getComponentSystem{})
 		for i := 0; i < benchmarkComponentCount; i++ {
-			e := NewEntity([]string{"getComponentSystem"})
+			e := NewEntity("getComponentSystem")
 			e.AddComponent(&MyComponent1{})
 			w.AddEntity(e)
 		}
@@ -71,7 +71,7 @@ func BenchmarkComponentDouble(b *testing.B) {
 	setup := func(w *World) {
 		w.AddSystem(&getComponentSystem{})
 		for i := 0; i < benchmarkComponentCount; i++ {
-			e := NewEntity([]string{"getComponentSystem"})
+			e := NewEntity("getComponentSystem")
 			e.AddComponent(&MyComponent1{})
 			e.AddComponent(&MyComponent2{})
 			w.AddEntity(e)
@@ -122,7 +122,7 @@ func BenchmarkComponentFast(b *testing.B) {
 	setup := func(w *World) {
 		w.AddSystem(&getComponentSystemFast{})
 		for i := 0; i < benchmarkComponentCount; i++ {
-			e := NewEntity([]string{"getComponentSystemFast"})
+			e := NewEntity("getComponentSystemFast")
 			e.AddComponent(&MyComponent1{})
 			w.AddEntity(e)
 		}
@@ -135,7 +135,7 @@ func BenchmarkComponentFastDouble(b *testing.B) {
 	setup := func(w *World) {
 		w.AddSystem(&getComponentSystemFast{})
 		for i := 0; i < benchmarkComponentCount; i++ {
-			e := NewEntity([]string{"getComponentSystemFast"})
+			e := NewEntity("getComponentSystemFast")
 			e.AddComponent(&MyComponent1{})
 			e.AddComponent(&MyComponent2{})
 			w.AddEntity(e)
@@ -145,7 +145,7 @@ func BenchmarkComponentFastDouble(b *testing.B) {
 }
 
 func BenchmarkComponentPure(b *testing.B) {
-	e := NewEntity(nil)
+	e := NewEntity()
 	e.AddComponent(&MyComponent1{1})
 
 	b.ResetTimer()
@@ -160,7 +160,7 @@ func BenchmarkComponentPure(b *testing.B) {
 }
 
 func BenchmarkComponentFastPure(b *testing.B) {
-	e := NewEntity(nil)
+	e := NewEntity()
 	e.AddComponent(&MyComponent1{1})
 
 	b.ResetTimer()

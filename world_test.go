@@ -17,9 +17,9 @@ func (ts *TestSystem) UpdateEntity(e *Entity, dt float32) {}
 func TestAddEntity(t *testing.T) {
 	world := World{}
 	world.New()
-	entityOne := NewEntity(nil)
+	entityOne := NewEntity()
 	world.AddEntity(entityOne)
-	entityTwo := NewEntity(nil)
+	entityTwo := NewEntity()
 	world.AddEntity(entityTwo)
 	if len(world.Entities()) != 2 {
 		log.Printf("Entities not added.  %d != 2: %+v\n", len(world.Entities()), world.Entities())
@@ -45,7 +45,7 @@ func TestAddComponent(t *testing.T) {
 	world := World{}
 	world.New()
 	world.AddSystem(&TestSystem{})
-	entity := NewEntity([]string{"TestSystem"})
+	entity := NewEntity("TestSystem")
 	world.AddEntity(entity)
 	component := &MyComponent1{5}
 	entity.AddComponent(component)
