@@ -1,7 +1,8 @@
+branch:
+    only:
+    - "master"
 language: go
 go_import_path: engo.io/ecs
 go:
-- 1.4
-- 1.5
-- 1.6
-- tip
+- 1.6.1
+
