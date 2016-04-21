@@ -4,5 +4,4 @@ branch:
 language: go
 go_import_path: engo.io/ecs
 go:
-- 1.6.1
-
+- 1.6.2
