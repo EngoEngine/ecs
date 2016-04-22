@@ -22,14 +22,14 @@ type Initializer interface {
 	New(*World)
 }
 
-// Systems implements a sortable list of `System`. It is indexed on `System.Priority()`.
-type Systems []System
+// systems implements a sortable list of `System`. It is indexed on `System.Priority()`.
+type systems []System
 
-func (s Systems) Len() int {
+func (s systems) Len() int {
 	return len(s)
 }
 
-func (s Systems) Less(i, j int) bool {
+func (s systems) Less(i, j int) bool {
 	var prio1, prio2 int
 
 	if prior1, ok := s[i].(Prioritizer); ok {
@@ -42,6 +42,6 @@ func (s Systems) Less(i, j int) bool {
 	return prio1 > prio2
 }
 
-func (s Systems) Swap(i, j int) {
+func (s systems) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }

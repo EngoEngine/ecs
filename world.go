@@ -7,7 +7,7 @@ import (
 // World contains a bunch of Entities, and a bunch of Systems.
 // It is the recommended way to run ecs
 type World struct {
-	systems Systems
+	systems systems
 }
 
 // AddSystem adds a new System to the World, and then sorts them based on Priority
