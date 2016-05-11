@@ -7,7 +7,7 @@ package ecs
 // By convention, systems provide an Add method for adding entities and their
 // associated components to the system; e.g.
 //
-//    Add(id ID, pos *Position)
+//    Add(basic *ecs.BasicEntity, collision *CollisionComponent, space *SpaceComponent)
 type System interface {
 	// Update updates the system. It is invoked by the engine once every frame,
 	// with dt being the duration since the previous update.
