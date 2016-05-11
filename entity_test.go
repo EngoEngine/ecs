@@ -17,14 +17,14 @@ type MySystemOne struct {
 
 func (*MySystemOne) Priority() int { return 0 }
 func (*MySystemOne) New(*World)    {}
-func (m *MySystemOne) Update(dt float32) {
-	for _, e := range m.entities {
+func (sys *MySystemOne) Update(dt float32) {
+	for _, e := range sys.entities {
 		e.c1.A = 5
 	}
 }
 func (*MySystemOne) Remove(e BasicEntity) {}
-func (m *MySystemOne) Add(e *BasicEntity, c1 *MyComponent1) {
-	m.entities = append(m.entities, MySystemOneEntity{e, c1})
+func (sys *MySystemOne) Add(e *BasicEntity, c1 *MyComponent1) {
+	sys.entities = append(sys.entities, MySystemOneEntity{e, c1})
 }
 
 type MySystemOneTwoEntity struct {
@@ -39,8 +39,8 @@ type MySystemOneTwo struct {
 
 func (*MySystemOneTwo) Priority() int { return 0 }
 func (*MySystemOneTwo) New(*World)    {}
-func (m *MySystemOneTwo) Update(dt float32) {
-	for _, e := range m.entities {
+func (sys *MySystemOneTwo) Update(dt float32) {
+	for _, e := range sys.entities {
 		if e.c1 == nil {
 			return
 		}
@@ -61,8 +61,8 @@ func (sys *MySystemOneTwo) Remove(e BasicEntity) {
 		sys.entities = append(sys.entities[:delete], sys.entities[delete+1:]...)
 	}
 }
-func (m *MySystemOneTwo) Add(e *BasicEntity, c1 *MyComponent1, c2 *MyComponent2) {
-	m.entities = append(m.entities, MySystemOneTwoEntity{e, c1, c2})
+func (sys *MySystemOneTwo) Add(e *BasicEntity, c1 *MyComponent1, c2 *MyComponent2) {
+	sys.entities = append(sys.entities, MySystemOneTwoEntity{e, c1, c2})
 }
 
 type MyEntity1 struct {

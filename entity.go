@@ -8,46 +8,51 @@ import (
 
 var (
 	counterLock sync.Mutex
-	id_incr     uint64
+	idInc       uint64
 )
 
-// Entity is the E in Entity Component System. It belongs to any amount of
-// Systems, and has a number of Components
+// A BasicEntity is simply a set of components with a unique ID attached to it,
+// nothing more. It belongs to any amount of Systems, and has a number of
+// Components
 type BasicEntity struct {
+	// Entity ID.
 	id uint64
 }
 
-// NewBasic creates a new Entity with a new unique identifier - can be called across multiple goroutines
+// NewBasic creates a new Entity with a new unique identifier. It is safe for
+// concurrent use.
 func NewBasic() BasicEntity {
 	counterLock.Lock()
-	id_incr++
-	if id_incr >= math.MaxUint64 {
+	idInc++
+	if idInc >= math.MaxUint64 {
 		log.Println("Warning: id overload")
-		id_incr = 1
+		idInc = 1
 	}
 	counterLock.Unlock()
-	return BasicEntity{id_incr}
+	return BasicEntity{idInc}
 }
 
-// NewBasics creates an amount of new entities with a new unique identifier - can be called across multiple goroutines
-// Performs better than NewBasic for large numbers of entities.
+// NewBasics creates an amount of new entities with a new unique identifiers. It
+// is safe for concurrent use, and performs better than NewBasic for large
+// numbers of entities.
 func NewBasics(amount int) []BasicEntity {
 	entities := make([]BasicEntity, amount)
 
 	counterLock.Lock()
 	for i := 0; i < amount; i++ {
-		id_incr++
-		if id_incr >= math.MaxUint64 {
+		idInc++
+		if idInc >= math.MaxUint64 {
 			log.Println("Warning: id overload")
-			id_incr = 1
+			idInc = 1
 		}
-		entities[i] = BasicEntity{id_incr}
+		entities[i] = BasicEntity{idInc}
 	}
 	counterLock.Unlock()
 
 	return entities
 }
 
+// ID returns the unique identifier of the entity.
 func (e BasicEntity) ID() uint64 {
 	return e.id
 }
