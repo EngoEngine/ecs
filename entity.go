@@ -1,14 +1,13 @@
 package ecs
 
 import (
-	"log"
-	"math"
 	"sync"
+	"sync/atomic"
 )
 
 var (
 	counterLock sync.Mutex
-	id_incr     uint64
+	idInc       uint64
 )
 
 // Entity is the E in Entity Component System. It belongs to any amount of
@@ -19,14 +18,7 @@ type BasicEntity struct {
 
 // NewBasic creates a new Entity with a new unique identifier - can be called across multiple goroutines
 func NewBasic() BasicEntity {
-	counterLock.Lock()
-	id_incr++
-	if id_incr >= math.MaxUint64 {
-		log.Println("Warning: id overload")
-		id_incr = 1
-	}
-	counterLock.Unlock()
-	return BasicEntity{id_incr}
+	return BasicEntity{id: atomic.AddUint64(&idInc, 1)}
 }
 
 // NewBasics creates an amount of new entities with a new unique identifier - can be called across multiple goroutines
@@ -36,12 +28,8 @@ func NewBasics(amount int) []BasicEntity {
 
 	counterLock.Lock()
 	for i := 0; i < amount; i++ {
-		id_incr++
-		if id_incr >= math.MaxUint64 {
-			log.Println("Warning: id overload")
-			id_incr = 1
-		}
-		entities[i] = BasicEntity{id_incr}
+		idInc++
+		entities[i] = BasicEntity{id: idInc}
 	}
 	counterLock.Unlock()
 
