@@ -188,3 +188,57 @@ func Bench(b *testing.B, preload func(), setup func(w *World)) {
 		w.Update(1 / 120) // 120 fps
 	}
 }
+
+func BenchmarkNewBasic(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasic()
+	}
+}
+
+func BenchmarkNewBasics1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(1)
+	}
+}
+
+func BenchmarkNewBasic10(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 10; j++ {
+			NewBasic()
+		}
+	}
+}
+
+func BenchmarkNewBasics10(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(10)
+	}
+}
+
+func BenchmarkNewBasic100(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 100; j++ {
+			NewBasic()
+		}
+	}
+}
+
+func BenchmarkNewBasics100(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(100)
+	}
+}
+
+func BenchmarkNewBasic1000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 1000; j++ {
+			NewBasic()
+		}
+	}
+}
+
+func BenchmarkNewBasics1000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(1000)
+	}
+}
