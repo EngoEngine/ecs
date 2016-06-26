@@ -1,6 +1,7 @@
 package ecs
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -145,6 +146,29 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+// TestIdentifierInterface makes sure that my entity can be stored as an Identifier interface
+func TestIdentifierInterface(t *testing.T) {
+	e1 := MyEntity1{}
+	e1.BasicEntity = NewBasic()
+
+	var slice []Identifier = []Identifier{e1}
+
+	_, ok := slice[0].(MyEntity1)
+	assert.True(t, ok, "MyEntity1 should have been recoverable from the Identifier interface")
+}
+
+func TestSortableIdentifierSlice(t *testing.T) {
+	e1 := MyEntity1{}
+	e1.BasicEntity = NewBasic()
+	e2 := MyEntity1{}
+	e2.BasicEntity = NewBasic()
+
+	var entities IdentifierSlice = []Identifier{e2, e1}
+	sort.Sort(entities)
+	assert.ObjectsAreEqual(e1, entities[0])
+	assert.ObjectsAreEqual(e2, entities[1])
+}
+
 func BenchmarkIdiomatic(b *testing.B) {
 	preload := func() {}
 	setup := func(w *World) {
@@ -186,5 +210,59 @@ func Bench(b *testing.B, preload func(), setup func(w *World)) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		w.Update(1 / 120) // 120 fps
+	}
+}
+
+func BenchmarkNewBasic(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasic()
+	}
+}
+
+func BenchmarkNewBasics1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(1)
+	}
+}
+
+func BenchmarkNewBasic10(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 10; j++ {
+			NewBasic()
+		}
+	}
+}
+
+func BenchmarkNewBasics10(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(10)
+	}
+}
+
+func BenchmarkNewBasic100(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 100; j++ {
+			NewBasic()
+		}
+	}
+}
+
+func BenchmarkNewBasics100(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(100)
+	}
+}
+
+func BenchmarkNewBasic1000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		for j := 0; j < 1000; j++ {
+			NewBasic()
+		}
+	}
+}
+
+func BenchmarkNewBasics1000(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBasics(1000)
 	}
 }
