@@ -1,6 +1,7 @@
 package ecs
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -154,6 +155,18 @@ func TestIdentifierInterface(t *testing.T) {
 
 	_, ok := slice[0].(MyEntity1)
 	assert.True(t, ok, "MyEntity1 should have been recoverable from the Identifier interface")
+}
+
+func TestSortableIdentifierSlice(t *testing.T) {
+	e1 := MyEntity1{}
+	e1.BasicEntity = NewBasic()
+	e2 := MyEntity1{}
+	e2.BasicEntity = NewBasic()
+
+	var entities IdentifierSlice = []Identifier{e2, e1}
+	sort.Sort(entities)
+	assert.ObjectsAreEqual(e1, entities[0])
+	assert.ObjectsAreEqual(e2, entities[1])
 }
 
 func BenchmarkIdiomatic(b *testing.B) {
