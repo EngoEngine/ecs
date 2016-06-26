@@ -16,6 +16,13 @@ type BasicEntity struct {
 	id uint64
 }
 
+// Identifier is an interface for anything that implements the basic ID() uint64,
+// as the BasicEntity does.  It is useful as more specific interface for an
+// entity registry than just the interface{} interface
+type Identifier interface {
+	ID() uint64
+}
+
 // NewBasic creates a new Entity with a new unique identifier - can be called across multiple goroutines
 func NewBasic() BasicEntity {
 	return BasicEntity{id: atomic.AddUint64(&idInc, 1)}

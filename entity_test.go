@@ -145,6 +145,17 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+// TestIdentifierInterface makes sure that my entity can be stored as an Identifier interface
+func TestIdentifierInterface(t *testing.T) {
+	e1 := MyEntity1{}
+	e1.BasicEntity = NewBasic()
+
+	var slice []Identifier = []Identifier{e1}
+
+	_, ok := slice[0].(MyEntity1)
+	assert.True(t, ok, "MyEntity1 should have been recoverable from the Identifier interface")
+}
+
 func BenchmarkIdiomatic(b *testing.B) {
 	preload := func() {}
 	setup := func(w *World) {
