@@ -12,7 +12,7 @@ In the Entity Component System paradigm, you have three elements;
 * Components
 * Systems. 
 
-In our implementation, we use the type `World` to work with those `System`s. Each `System` can have references to any number (including 0) of Entities. And each `Entity` can have as many `Component`s as desired. 
+In our implementation, we use the type `World` to work with those `System`s. Each `System` can have references to any number (including 0) of entities. And each `Entity` can have as many `Component`s as desired. 
 
 An example of creating a `World`, adding a `System` to it, and update all systems
 ```go
@@ -63,7 +63,9 @@ type Prioritizer interface {
 ```
 
 ## Entities and Components
-Where do the entities come in? `System`s can "use" entities by manipulating values of the `Component`s of those entities. An `Entity` is no more than a wrapper which combines multiple `Component`s and adds a unique identifier to the whole. Because the precise definition of those `Component`s can vary, `ecs` provides no `Component`s. The `engo` package offers lots of `Component`s and `System`s to work with, out of the box. 
+Where do the entities come in? All game-logic has to be done within `System`s (the `Update` method, to be precise)). `Component`s store data (which is used by those `System`s). An `Entity` is no more than a wrapper which combines multiple `Component`s and adds a unique identifier to the whole. This unique identifier is nothing magic: simply an incrementing integer value - nothing to worry about.
+
+> Because the precise definition of those `Component`s can vary, this `ecs` package provides no `Component`s -- we only provide examples here. The `engo.io/engo/common` package offers lots of `Component`s and `System`s to work with, out of the box. 
 
 Let's view an example:
 
@@ -78,14 +80,14 @@ type HealthComponent struct {
     ManaPercentage   float32
 }
 
-type Guy struct {
+type Player struct {
     ecs.BasicEntity
     SpaceComponent
     HealthComponent
 }
 ```
 
-Here, the type `Guy` is made out of three elements: the unique identifier (`ecs.BasicEntity`) and two `Component`s. A `System` may make use of one or more of those `Component`s. Which are required, is defined by the `Add` method on that `System`. 
+Here, the type `Player` is made out of three elements: the unique identifier (`ecs.BasicEntity`) and two `Component`s. A `System` may make use of one or more of those `Component`s. Which are required, is defined by the `Add` method on that `System`. 
 
 Let's view a few examples:
 
@@ -102,7 +104,7 @@ These three different `Add` methods are all valid, and use different Components.
 ```go
 // Initialize our custom Entity
 // NOTE: we have to call `ecs.NewBasic` here, to give our Entity a new unique identifier
-guy := Guy{BasicEntity: ecs.NewBasic()}
+player := Player{BasicEntity: ecs.NewBasic()}
 
 // Loop over all Systems
 for _, system := range world.Systems() {
@@ -112,9 +114,9 @@ for _, system := range world.Systems() {
     
         // Create a case for each System you want to use
         case *MySystem1:
-            sys.Add(&guy.BasicEntity, &guy.SpaceComponent)
+            sys.Add(&player.BasicEntity, &player.SpaceComponent)
         case *MySystem3:
-            sys.Add(&guy.BasicEntity, &guy.SpaceComponent, &guy.Healthcomponent)
+            sys.Add(&player.BasicEntity, &player.SpaceComponent, &player.Healthcomponent)
     }
 }
 ```
@@ -127,7 +129,7 @@ You more than likely will want to create `System`s yourself. We will now go in d
 
 > We do ask you to let *the first argument* be of type `*ecs.BasicEntity` - as a general rule. 
 
-Your `System` should include an array, slice or map in which to store those entities. Now it is important to note that you're not receiving entities per se -- you are receiving references to the `Component`s you need. The actual `Entity` (type `Guy` in our example) may contain way more `Component`s. You will most-likely want to create a struct for you to store those pointers in. An example:
+Your `System` should include an array, slice or map in which to store those entities. Now it is important to note that you're not receiving entities per se -- you are receiving references to the `Component`s you need. The actual `Entity` (type `Player` in our example) may contain way more `Component`s. You will most-likely want to create a struct for you to store those pointers in. An example:
 
 ```go
 type myAWesomeEntity struct {
@@ -145,7 +147,7 @@ func (m *MyAesomeSystem) Add(basic *ecs.BasicEntity, space *SpaceComponent) {
 ```
 
 > ### NOTE
-> As a convention, please include "System" in the name of your `System` -- at the end. When you define a struct (which contains pointers, as opposed to the `Guy` struct we created earlier), please replace that `System` part with `Entity`. You should **only** use this newly-created struct in your similarly-named `System`. You will usually *never* want to export that `Entity` definition, as it is only being used in that `System`. If your system would be called `BallMovementSystem`, then your struct would be called `ballMOvementEntity`. 
+> As a convention, please include "System" in the name of your `System` -- at the end. When you define a struct (which contains pointers, as opposed to the `Player` struct we created earlier), please replace that `System` part with `Entity`. You should **only** use this newly-created struct in your similarly-named `System`. You will usually *never* want to export that `Entity` definition, as it is only being used in that `System`. If your system would be called `BallMovementSystem`, then your struct would be called `ballMovementEntity`. 
 
 ### Removing Entities from your System
 Your `System` must implement the `Remove` method as specified by the `System` interface. Whenever you start storing entities, you should define this method in such a way, that it removes the custom-created non-exported `Entity`-struct from the array, slice or map. An `ecs.BasicEntity` is given for you to figure out which element in the array, slice or map it is. 
