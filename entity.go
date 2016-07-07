@@ -10,9 +10,11 @@ var (
 	idInc       uint64
 )
 
-// Entity is the E in Entity Component System. It belongs to any amount of
-// Systems, and has a number of Components
+// A BasicEntity is simply a set of components with a unique ID attached to it,
+// nothing more. It belongs to any amount of Systems, and has a number of
+// Components
 type BasicEntity struct {
+	// Entity ID.
 	id uint64
 }
 
@@ -27,13 +29,15 @@ type Identifier interface {
 // store entites in slices, and use the P=n*log n lookup for them
 type IdentifierSlice []Identifier
 
-// NewBasic creates a new Entity with a new unique identifier - can be called across multiple goroutines
+// NewBasic creates a new Entity with a new unique identifier. It is safe for
+// concurrent use.
 func NewBasic() BasicEntity {
 	return BasicEntity{id: atomic.AddUint64(&idInc, 1)}
 }
 
-// NewBasics creates an amount of new entities with a new unique identifier - can be called across multiple goroutines
-// Performs better than NewBasic for large numbers of entities.
+// NewBasics creates an amount of new entities with a new unique identifiers. It
+// is safe for concurrent use, and performs better than NewBasic for large
+// numbers of entities.
 func NewBasics(amount int) []BasicEntity {
 	entities := make([]BasicEntity, amount)
 
@@ -47,6 +51,7 @@ func NewBasics(amount int) []BasicEntity {
 	return entities
 }
 
+// ID returns the unique identifier of the entity.
 func (e BasicEntity) ID() uint64 {
 	return e.id
 }
