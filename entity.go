@@ -56,11 +56,12 @@ func (e BasicEntity) ID() uint64 {
 	return e.id
 }
 
-//By having this, All Entities, with this component, now have a GetBasicEntity Method
-//This allows system.Add functions to recieve a single interface
-//EG:
+// GetBasicEntity returns a Pointer to the BasicEntity itself
+// By having this method, All Entities containing a BasicEntity now automatically have a GetBasicEntity Method
+// This allows system.Add functions to recieve a single interface
+// EG:
 // s.AddByInterface(a interface{GetBasicEntity()*BasicEntity, GetSpaceComponent()*SpaceComponent){
-//    s.Add(a.GetBasicEntity(),a.GetSpaceComponent())
+// s.Add(a.GetBasicEntity(),a.GetSpaceComponent())
 //}
 func (e *BasicEntity) GetBasicEntity() *BasicEntity {
 	return e
