@@ -56,6 +56,17 @@ func (e BasicEntity) ID() uint64 {
 	return e.id
 }
 
+// GetBasicEntity returns a Pointer to the BasicEntity itself
+// By having this method, All Entities containing a BasicEntity now automatically have a GetBasicEntity Method
+// This allows system.Add functions to recieve a single interface
+// EG:
+// s.AddByInterface(a interface{GetBasicEntity()*BasicEntity, GetSpaceComponent()*SpaceComponent){
+// s.Add(a.GetBasicEntity(),a.GetSpaceComponent())
+//}
+func (e *BasicEntity) GetBasicEntity() *BasicEntity {
+	return e
+}
+
 // Len returns the length of the underlying slice
 // part of the sort.Interface
 func (is IdentifierSlice) Len() int {
