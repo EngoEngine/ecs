@@ -132,7 +132,7 @@ You more than likely will want to create `System`s yourself. We will now go in d
 Your `System` should include an array, slice or map in which to store those entities. Now it is important to note that you're not receiving entities per se -- you are receiving references to the `Component`s you need. The actual `Entity` (type `Player` in our example) may contain way more `Component`s. You will most-likely want to create a struct for you to store those pointers in. An example:
 
 ```go
-type myAWesomeEntity struct {
+type myAwesomeEntity struct {
     *ecs.BasicEntity
     *SpaceComponent
 }
@@ -141,7 +141,7 @@ type MyAwesomeSystem struct {
     entities []myAwesomeEntity
 }
 
-func (m *MyAesomeSystem) Add(basic *ecs.BasicEntity, space *SpaceComponent) {
+func (m *MyAwesomeSystem) Add(basic *ecs.BasicEntity, space *SpaceComponent) {
     m.entities = append(m.entities, myAwesomeEntity{basic, space})
 }
 ```
