@@ -169,6 +169,22 @@ func TestSortableIdentifierSlice(t *testing.T) {
 	assert.ObjectsAreEqual(e2, entities[1])
 }
 
+// TestBulkCreateBasics checks that bulk creating using NewBasics doesn't have a data race
+func TestBulkCreateBasics(t *testing.T) {
+	var e1, e2 []BasicEntity
+	entityChan := make(chan []BasicEntity)
+	cb := func(out chan<- []BasicEntity) {
+		out <- NewBasics(1000)
+	}
+
+	go cb(entityChan)
+	go cb(entityChan)
+	e1 = <-entityChan
+	e2 = <-entityChan
+	assert.Len(t, e1, 1000)
+	assert.Len(t, e2, 1000)
+}
+
 func BenchmarkIdiomatic(b *testing.B) {
 	preload := func() {}
 	setup := func(w *World) {

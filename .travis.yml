@@ -3,5 +3,6 @@ branch:
     - "master"
 language: go
 go_import_path: engo.io/ecs
+script: go test -v -race ./...
 go:
 - 1.6.2
