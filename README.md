@@ -189,3 +189,109 @@ func (m *MyAwesomeSystem) Update(dt float32) {
     }
 }
 ```
+
+# Automatically add entities to systems
+When your game gets *really* big, adding each entity to every system would be time consuming and buggy using the methods mentioned above. However, you can easily add entities to systems based solely on the interfaces that entity implements by
+utilizing the `SystemAddByInterfacer`. This takes a bit of work up front, but makes things much easier if your number of systems and entities increases. We're going to start with an example `System` MySystem, with `Component` ComponentA
+
+```go
+type ComponentA struct {
+    num int
+}
+
+type mySystemEntity struct {
+    ecs.BasicEntity
+    *ComponentA
+}
+
+type MySystem struct {
+    entities []mySystemEntity
+}
+
+type (m *MySystem) Add(basic ecs.BasicEntity, a *ComponentA) { /* Add stuff goes here */ }
+type (m *MySystem) Remove(basic ecs.BasicEntity) { /* Remove stuff here */ }
+type (m *MySystem) Update(dt float32) { /* Update stuff here */ }
+```
+
+The components need to have corresponding Getters and Interfaces in order to be utilized. Let's add them
+
+```go
+func (a *ComponentA) GetComponentA() *ComponentA {
+    reurn a
+}
+
+type AFace interface {
+    GetComponentA() *ComponentA
+}
+```
+
+### Note
+The convention is that we add Face to the end of the component's name for the interface.
+
+Now that we have interfaces for all the components, we need to add an interface to tell if we use the system or not. (BasicEntity already has this setup for you, as does any component or system that uses entities in `engo/common`)
+
+```go
+type Myable interface {
+    ecs.BasicFace
+    AFace
+}
+```
+
+### Note
+The convention is to add able to the end of the system's name for the interface
+
+Finally, we have to add the AddByInterface function to the system. Don't worry about the casting, it can't panic as the world makes sure it implements the required interface befor passing entities to it.
+
+```go
+func (m *MySystem) AddByInterface(o interface{}) {
+    obj := o.(Myable)
+    m.Add(obj.GetBasicEntity(), obj.GetComponentA())
+}
+```
+
+To use the system, instead of `w.AddSystem()` use 
+
+```go
+var myable *Myable
+w.AddSystemInterface(&MySystem{}, myable, nil)
+```
+
+### Note 
+This takes **a pointer to** the interface that the system needs implemented to use AddByInterface.
+
+Finally, to add an entity, rather than looping through all the systems, you can just
+
+```go
+w.AddEntity(&entity)
+```
+
+## Exclude flags
+You can also add an interface to the system for components that can act as flags to NOT add an entity to that system. First you'll have to make the component. It'll have to have a Getter and Interface as well.
+
+```go
+type NotMyComponent struct {}
+type NotMyFace interface {
+    GetNotMyComponent() *NotMyComponent
+}
+func (n *NotMyComponent) GetNotMyComponent() *NotMyComponent {
+    return n
+}
+```
+
+Then you can make the interface for the system
+
+```go
+type NotMyable interface {
+    NotMyFace
+}
+```
+
+Finally, we add it to the world
+
+```go
+var myable *Myable
+var notMyable *NotMyable
+w.AddSystemInterface(&MySystem{}, myable, notMyable)
+```
+
+Now our system can automatically, and it'll include all the entities that implement the Myable interface, except any entity that implements the NotMyable interface.
