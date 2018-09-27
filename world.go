@@ -85,7 +85,7 @@ func (w *World) AddEntity(e Identifier) {
 		}
 		if in, ok := w.sysIn[reflect.TypeOf(sys)]; ok {
 			if reflect.TypeOf(e).Implements(in) {
-				w.Mu.RUnlock()
+				mu.RUnlock()
 				sys.AddByInterface(e)
 				mu.RLock()
 			}
