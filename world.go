@@ -18,14 +18,18 @@ type World struct {
 
 // AddSystem adds the given System to the World, sorted by priority.
 func (w *World) AddSystem(system System) {
-	mu.Lock()
-	defer mu.Unlock()
+	mu.RLock()
 	if initializer, ok := system.(Initializer); ok {
+		mu.RUnlock()
 		initializer.New(w)
+		mu.RLock()
 	}
+	mu.RUnlock()
 
+	mu.Lock()
 	w.systems = append(w.systems, system)
 	sort.Sort(w.systems)
+	mu.Unlock()
 }
 
 // AddSystemInterface adds a system to the world, but also adds a filter that allows
