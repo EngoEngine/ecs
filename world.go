@@ -97,6 +97,8 @@ func (w *World) AddEntity(e Identifier) {
 
 // Systems returns the list of Systems managed by the World.
 func (w *World) Systems() []System {
+	mu.RLock()
+	defer mu.RUnlock()
 	return w.systems
 }
 
