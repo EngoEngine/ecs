@@ -1,12 +1,10 @@
 package ecs
 
 import (
-	"sync"
 	"sync/atomic"
 )
 
 var (
-	counterLock sync.Mutex
 	idInc       uint64
 )
 
@@ -41,12 +39,10 @@ func NewBasic() BasicEntity {
 func NewBasics(amount int) []BasicEntity {
 	entities := make([]BasicEntity, amount)
 
-	counterLock.Lock()
+	lastId := atomic.AddUint64(&idInc, uint64(amount))
 	for i := 0; i < amount; i++ {
-		idInc++
-		entities[i] = BasicEntity{id: idInc}
+		entities[i] = BasicEntity{id: lastId - uint64(i) + 1}
 	}
-	counterLock.Unlock()
 
 	return entities
 }
