@@ -41,7 +41,7 @@ func NewBasics(amount int) []BasicEntity {
 
 	lastId := atomic.AddUint64(&idInc, uint64(amount))
 	for i := 0; i < amount; i++ {
-		entities[i] = BasicEntity{id: lastId - uint64(i) + 1}
+		entities[i].id = lastId - uint64(amount) + uint64(i) + 1
 	}
 
 	return entities
