@@ -381,6 +381,29 @@ func TestSystemEntityFiltering(t *testing.T) {
 	assert.Equal(t, 0, e12x12x2.D, "e12x12x2 was updated by system 12")
 }
 
+// TestParentChild tests parenting of BasicEntities
+func TestParentChild(t *testing.T) {
+	parent := NewBasic()
+	children := NewBasics(3)
+	if len(parent.Children()) != 0 {
+		t.Errorf("Children did not initalize to a zero value")
+	}
+	if parent.Parent() != nil {
+		t.Errorf("Parent did not initalize as nil")
+	}
+	parent.AppendChild(&children[0])
+	parent.AppendChild(&children[1])
+	parent.AppendChild(&children[2])
+	if len(parent.Children()) != 3 {
+		t.Errorf("Failed to add all three children to parent")
+	}
+	for i := 0; i < 3; i++ {
+		if children[i].Parent() != &parent {
+			t.Errorf("Parent was not updated properly for children.")
+		}
+	}
+}
+
 func BenchmarkIdiomatic(b *testing.B) {
 	preload := func() {}
 	setup := func(w *World) {

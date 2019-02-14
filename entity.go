@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	idInc       uint64
+	idInc uint64
 )
 
 // A BasicEntity is simply a set of components with a unique ID attached to it,
@@ -13,7 +13,9 @@ var (
 // Components
 type BasicEntity struct {
 	// Entity ID.
-	id uint64
+	id       uint64
+	parent   *BasicEntity
+	children []BasicEntity
 }
 
 // Identifier is an interface for anything that implements the basic ID() uint64,
@@ -39,9 +41,9 @@ func NewBasic() BasicEntity {
 func NewBasics(amount int) []BasicEntity {
 	entities := make([]BasicEntity, amount)
 
-	lastId := atomic.AddUint64(&idInc, uint64(amount))
+	lastID := atomic.AddUint64(&idInc, uint64(amount))
 	for i := 0; i < amount; i++ {
-		entities[i].id = lastId - uint64(amount) + uint64(i) + 1
+		entities[i].id = lastID - uint64(amount) + uint64(i) + 1
 	}
 
 	return entities
@@ -61,6 +63,22 @@ func (e BasicEntity) ID() uint64 {
 //}
 func (e *BasicEntity) GetBasicEntity() *BasicEntity {
 	return e
+}
+
+// AppendChild appends a child to the BasicEntity
+func (e *BasicEntity) AppendChild(child *BasicEntity) {
+	child.parent = e
+	e.children = append(e.children, *child)
+}
+
+// Children returns the children of the BasicEntity
+func (e *BasicEntity) Children() []BasicEntity {
+	return e.children
+}
+
+// Parent returns the parent of the BasicEntity
+func (e *BasicEntity) Parent() *BasicEntity {
+	return e.parent
 }
 
 // Len returns the length of the underlying slice
