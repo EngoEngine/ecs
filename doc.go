@@ -33,4 +33,4 @@
 //
 // For instance, an animation system may render entities possessing animation
 // components.
-package ecs // import "engo.io/ecs"
+package ecs
