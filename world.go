@@ -33,7 +33,7 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
 
-	if reflect.TypeOf(in) != reflect.TypeOf([]interface{}{}) {
+	if reflect.TypeOf(in).AssignableTo(reflect.TypeOf([]interface{}{})) {
 		in = []interface{}{in}
 	}
 	for _, v := range in.([]interface{}) {
@@ -48,13 +48,12 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 		w.sysEx = make(map[reflect.Type][]reflect.Type)
 	}
 
-	if reflect.TypeOf(ex) != reflect.TypeOf([]interface{}{}) {
+	if !reflect.TypeOf(ex).AssignableTo(reflect.TypeOf([]interface{}{})) {
 		ex = []interface{}{ex}
 	}
 	for _, v := range ex.([]interface{}) {
 		w.sysEx[reflect.TypeOf(sys)] = append(w.sysEx[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
 	}
-	// w.sysEx[reflect.TypeOf(sys)] = reflect.TypeOf(ex).Elem()
 }
 
 // AddEntity adds the entity to all systems that have been added via
@@ -67,6 +66,15 @@ func (w *World) AddEntity(e Identifier) {
 	if w.sysEx == nil {
 		w.sysEx = make(map[reflect.Type][]reflect.Type)
 	}
+
+	search := func(i Identifier, types []reflect.Type) bool {
+		for _, t := range types {
+			if reflect.TypeOf(i).Implements(t) {
+				return true
+			}
+		}
+		return false
+	}
 	for _, system := range w.systems {
 		sys, ok := system.(SystemAddByInterfacer)
 		if !ok {
@@ -74,20 +82,14 @@ func (w *World) AddEntity(e Identifier) {
 		}
 
 		if ex, not := w.sysEx[reflect.TypeOf(sys)]; not {
-			for _, t := range ex {
-				if reflect.TypeOf(e).Implements(t) {
-					// TODO: Issue
-					continue
-				}
+			if search(e, ex) {
+				continue
 			}
 		}
 		if in, ok := w.sysIn[reflect.TypeOf(sys)]; ok {
-			for _, t := range in {
-				if reflect.TypeOf(e).Implements(t) {
-					sys.AddByInterface(e)
-					// TODO: Issue
-					continue
-				}
+			if search(e, in) {
+				sys.AddByInterface(e)
+				continue
 			}
 		}
 	}
