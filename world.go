@@ -9,7 +9,7 @@ import (
 // recommended way to run ecs.
 type World struct {
 	systems      systems
-	sysIn, sysEx map[reflect.Type]reflect.Type
+	sysIn, sysEx map[reflect.Type][]reflect.Type
 }
 
 // AddSystem adds the given System to the World, sorted by priority.
@@ -30,20 +30,24 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 	w.AddSystem(sys)
 
 	if w.sysIn == nil {
-		w.sysIn = make(map[reflect.Type]reflect.Type)
+		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
-
-	w.sysIn[reflect.TypeOf(sys)] = reflect.TypeOf(in).Elem()
+	
+	for _, v := range in.([]interface{}) {
+		w.sysIn[reflect.TypeOf(sys)] = append(w.sysIn[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
+	}
 
 	if ex == nil {
 		return
 	}
 
 	if w.sysEx == nil {
-		w.sysEx = make(map[reflect.Type]reflect.Type)
+		w.sysEx = make(map[reflect.Type][]reflect.Type)
 	}
 
-	w.sysEx[reflect.TypeOf(sys)] = reflect.TypeOf(ex).Elem()
+	for _, v := range ex.([]interface{}) {
+		w.sysEx[reflect.TypeOf(sys)] = append(w.sysEx[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
+	}
 }
 
 // AddEntity adds the entity to all systems that have been added via
@@ -51,10 +55,10 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 // added to it.
 func (w *World) AddEntity(e Identifier) {
 	if w.sysIn == nil {
-		w.sysIn = make(map[reflect.Type]reflect.Type)
+		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
 	if w.sysEx == nil {
-		w.sysEx = make(map[reflect.Type]reflect.Type)
+		w.sysEx = make(map[reflect.Type][]reflect.Type)
 	}
 	for _, system := range w.systems {
 		sys, ok := system.(SystemAddByInterfacer)
@@ -62,13 +66,20 @@ func (w *World) AddEntity(e Identifier) {
 			continue
 		}
 		if ex, not := w.sysEx[reflect.TypeOf(sys)]; not {
-			if reflect.TypeOf(e).Implements(ex) {
-				continue
+			for _, t := range ex {
+				if reflect.TypeOf(e).Implements(t) {
+					// TODO: Issue
+					continue
+				}
 			}
 		}
 		if in, ok := w.sysIn[reflect.TypeOf(sys)]; ok {
-			if reflect.TypeOf(e).Implements(in) {
-				sys.AddByInterface(e)
+			for _, t := range in {
+				if reflect.TypeOf(e).Implements(t) {
+					sys.AddByInterface(e)
+					// TODO: Issue
+					continue
+				}
 			}
 		}
 	}
