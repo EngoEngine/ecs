@@ -33,7 +33,7 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
 
-	if reflect.TypeOf(in).AssignableTo(reflect.TypeOf([]interface{}{})) {
+	if !reflect.TypeOf(in).AssignableTo(reflect.TypeOf([]interface{}{})) {
 		in = []interface{}{in}
 	}
 	for _, v := range in.([]interface{}) {
