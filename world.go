@@ -32,7 +32,10 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 	if w.sysIn == nil {
 		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
-	
+
+	if reflect.TypeOf(in) != reflect.TypeOf([]interface{}{}) {
+		in = []interface{}{in}
+	}
 	for _, v := range in.([]interface{}) {
 		w.sysIn[reflect.TypeOf(sys)] = append(w.sysIn[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
 	}
@@ -45,9 +48,13 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 		w.sysEx = make(map[reflect.Type][]reflect.Type)
 	}
 
+	if reflect.TypeOf(ex) != reflect.TypeOf([]interface{}{}) {
+		ex = []interface{}{ex}
+	}
 	for _, v := range ex.([]interface{}) {
 		w.sysEx[reflect.TypeOf(sys)] = append(w.sysEx[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
 	}
+	// w.sysEx[reflect.TypeOf(sys)] = reflect.TypeOf(ex).Elem()
 }
 
 // AddEntity adds the entity to all systems that have been added via
@@ -65,6 +72,7 @@ func (w *World) AddEntity(e Identifier) {
 		if !ok {
 			continue
 		}
+
 		if ex, not := w.sysEx[reflect.TypeOf(sys)]; not {
 			for _, t := range ex {
 				if reflect.TypeOf(e).Implements(t) {
