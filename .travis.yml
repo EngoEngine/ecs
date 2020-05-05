@@ -2,6 +2,6 @@ branch:
     only:
     - "master"
 language: go
-go_import_path: engo.io/ecs
+go_import_path: github.com/EngoEngine/ecs
 go:
-- 1.6.2
+- "1.12"

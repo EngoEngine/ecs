@@ -1,13 +1,11 @@
 package ecs
 
 import (
-	"sync"
 	"sync/atomic"
 )
 
 var (
-	counterLock sync.Mutex
-	idInc       uint64
+	idInc uint64
 )
 
 // A BasicEntity is simply a set of components with a unique ID attached to it,
@@ -15,7 +13,9 @@ var (
 // Components
 type BasicEntity struct {
 	// Entity ID.
-	id uint64
+	id       uint64
+	parent   *BasicEntity
+	children []*BasicEntity
 }
 
 // Identifier is an interface for anything that implements the basic ID() uint64,
@@ -41,12 +41,10 @@ func NewBasic() BasicEntity {
 func NewBasics(amount int) []BasicEntity {
 	entities := make([]BasicEntity, amount)
 
-	counterLock.Lock()
+	lastID := atomic.AddUint64(&idInc, uint64(amount))
 	for i := 0; i < amount; i++ {
-		idInc++
-		entities[i] = BasicEntity{id: idInc}
+		entities[i].id = lastID - uint64(amount) + uint64(i) + 1
 	}
-	counterLock.Unlock()
 
 	return entities
 }
@@ -65,6 +63,57 @@ func (e BasicEntity) ID() uint64 {
 //}
 func (e *BasicEntity) GetBasicEntity() *BasicEntity {
 	return e
+}
+
+// AppendChild appends a child to the BasicEntity
+func (e *BasicEntity) AppendChild(child *BasicEntity) {
+	child.parent = e
+	e.children = append(e.children, child)
+}
+
+func (e *BasicEntity) RemoveChild(child *BasicEntity) {
+	delete := -1
+	for i, v := range e.children {
+		if v.ID() == child.ID() {
+			delete = i
+			break
+		}
+	}
+	if delete >= 0 {
+		e.children = append(e.children[:delete], e.children[delete+1:]...)
+	}
+}
+
+// Children returns the children of the BasicEntity
+func (e *BasicEntity) Children() []BasicEntity {
+	ret := []BasicEntity{}
+	for _, child := range e.children {
+		ret = append(ret, *child)
+	}
+	return ret
+}
+
+// var visited map[uint64]struct{}
+// var descs []*BasicEntity
+
+// Descendents returns the children and their children all the way down the tree.
+func (e *BasicEntity) Descendents() []BasicEntity {
+	return descendents([]BasicEntity{}, e, e)
+}
+
+func descendents(in []BasicEntity, this, top *BasicEntity) []BasicEntity {
+	for _, child := range this.children {
+		in = descendents(in, child, top)
+	}
+	if this.ID() == top.ID() {
+		return in
+	}
+	return append(in, *this)
+}
+
+// Parent returns the parent of the BasicEntity
+func (e *BasicEntity) Parent() *BasicEntity {
+	return e.parent
 }
 
 // Len returns the length of the underlying slice

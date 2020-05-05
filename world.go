@@ -13,7 +13,7 @@ var mu = &sync.RWMutex{}
 type World struct {
 	Mu           *sync.RWMutex
 	systems      systems
-	sysIn, sysEx map[reflect.Type]reflect.Type
+	sysIn, sysEx map[reflect.Type][]reflect.Type
 }
 
 // AddSystem adds the given System to the World, sorted by priority.
@@ -42,10 +42,15 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 	mu.Lock()
 	defer mu.Unlock()
 	if w.sysIn == nil {
-		w.sysIn = make(map[reflect.Type]reflect.Type)
+		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
 
-	w.sysIn[reflect.TypeOf(sys)] = reflect.TypeOf(in).Elem()
+	if !reflect.TypeOf(in).AssignableTo(reflect.TypeOf([]interface{}{})) {
+		in = []interface{}{in}
+	}
+	for _, v := range in.([]interface{}) {
+		w.sysIn[reflect.TypeOf(sys)] = append(w.sysIn[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
+	}
 
 	if ex == nil {
 		return
@@ -53,10 +58,15 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 	}
 
 	if w.sysEx == nil {
-		w.sysEx = make(map[reflect.Type]reflect.Type)
+		w.sysEx = make(map[reflect.Type][]reflect.Type)
 	}
 
-	w.sysEx[reflect.TypeOf(sys)] = reflect.TypeOf(ex).Elem()
+	if !reflect.TypeOf(ex).AssignableTo(reflect.TypeOf([]interface{}{})) {
+		ex = []interface{}{ex}
+	}
+	for _, v := range ex.([]interface{}) {
+		w.sysEx[reflect.TypeOf(sys)] = append(w.sysEx[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
+	}
 }
 
 // AddEntity adds the entity to all systems that have been added via
@@ -65,10 +75,19 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 func (w *World) AddEntity(e Identifier) {
 	mu.Lock()
 	if w.sysIn == nil {
-		w.sysIn = make(map[reflect.Type]reflect.Type)
+		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
 	if w.sysEx == nil {
-		w.sysEx = make(map[reflect.Type]reflect.Type)
+		w.sysEx = make(map[reflect.Type][]reflect.Type)
+	}
+
+	search := func(i Identifier, types []reflect.Type) bool {
+		for _, t := range types {
+			if reflect.TypeOf(i).Implements(t) {
+				return true
+			}
+		}
+		return false
 	}
 	mu.Unlock()
 
@@ -78,16 +97,18 @@ func (w *World) AddEntity(e Identifier) {
 		if !ok {
 			continue
 		}
+
 		if ex, not := w.sysEx[reflect.TypeOf(sys)]; not {
-			if reflect.TypeOf(e).Implements(ex) {
+			if search(e, ex) {
 				continue
 			}
 		}
 		if in, ok := w.sysIn[reflect.TypeOf(sys)]; ok {
-			if reflect.TypeOf(e).Implements(in) {
-				mu.RUnlock()
+			if search(e, in) {
+        mu.RUnlock()
 				sys.AddByInterface(e)
-				mu.RLock()
+        mu.RLock()
+				continue
 			}
 		}
 	}
