@@ -15,7 +15,7 @@ type BasicEntity struct {
 	// Entity ID.
 	id       uint64
 	parent   *BasicEntity
-	children []BasicEntity
+	children []*BasicEntity
 }
 
 // Identifier is an interface for anything that implements the basic ID() uint64,
@@ -68,12 +68,47 @@ func (e *BasicEntity) GetBasicEntity() *BasicEntity {
 // AppendChild appends a child to the BasicEntity
 func (e *BasicEntity) AppendChild(child *BasicEntity) {
 	child.parent = e
-	e.children = append(e.children, *child)
+	e.children = append(e.children, child)
+}
+
+func (e *BasicEntity) RemoveChild(child *BasicEntity) {
+	delete := -1
+	for i, v := range e.children {
+		if v.ID() == child.ID() {
+			delete = i
+			break
+		}
+	}
+	if delete >= 0 {
+		e.children = append(e.children[:delete], e.children[delete+1:]...)
+	}
 }
 
 // Children returns the children of the BasicEntity
 func (e *BasicEntity) Children() []BasicEntity {
-	return e.children
+	ret := []BasicEntity{}
+	for _, child := range e.children {
+		ret = append(ret, *child)
+	}
+	return ret
+}
+
+// var visited map[uint64]struct{}
+// var descs []*BasicEntity
+
+// Descendents returns the children and their children all the way down the tree.
+func (e *BasicEntity) Descendents() []BasicEntity {
+	return descendents([]BasicEntity{}, e, e)
+}
+
+func descendents(in []BasicEntity, this, top *BasicEntity) []BasicEntity {
+	for _, child := range this.children {
+		in = descendents(in, child, top)
+	}
+	if this.ID() == top.ID() {
+		return in
+	}
+	return append(in, *this)
 }
 
 // Parent returns the parent of the BasicEntity
