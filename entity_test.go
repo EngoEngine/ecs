@@ -404,6 +404,57 @@ func TestParentChild(t *testing.T) {
 	}
 }
 
+// TestRemoveChild tests removing a child
+func TestRemoveChild(t *testing.T) {
+	parent := NewBasic()
+	children := NewBasics(3)
+	parent.AppendChild(&children[0])
+	parent.AppendChild(&children[1])
+	parent.AppendChild(&children[2])
+	if len(parent.Children()) != 3 {
+		t.Errorf("Parent did not successfully add all three children.")
+	}
+	parent.RemoveChild(&children[1])
+	if len(parent.Children()) != 2 {
+		t.Errorf("Parent didd not successfully remove a child")
+	}
+	for i := 0; i < 2; i++ {
+		if children[1].ID() == parent.Children()[i].ID() {
+			t.Errorf("Found removed child in parent still")
+		}
+	}
+}
+
+func TestDescendents(t *testing.T) {
+	parent := NewBasic()
+	children := NewBasics(7)
+	parent.AppendChild(&children[0])
+	parent.AppendChild(&children[1])
+	parent.AppendChild(&children[2])
+	children[0].AppendChild(&children[3])
+	children[0].AppendChild(&children[4])
+	children[1].AppendChild(&children[5])
+	children[3].AppendChild(&children[6])
+
+	if len(parent.Descendents()) != 7 {
+		t.Errorf("Parent did not have all descendents.")
+	}
+	testMap := map[uint64]struct{}{}
+	testMap[children[0].ID()] = struct{}{}
+	testMap[children[1].ID()] = struct{}{}
+	testMap[children[2].ID()] = struct{}{}
+	testMap[children[3].ID()] = struct{}{}
+	testMap[children[4].ID()] = struct{}{}
+	testMap[children[5].ID()] = struct{}{}
+	testMap[children[6].ID()] = struct{}{}
+	for _, d := range parent.Descendents() {
+		delete(testMap, d.ID())
+	}
+	if len(testMap) != 0 {
+		t.Errorf("Expected children not found in parent. Did not find %v", testMap)
+	}
+}
+
 func BenchmarkIdiomatic(b *testing.B) {
 	preload := func() {}
 	setup := func(w *World) {
