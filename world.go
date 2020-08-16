@@ -114,3 +114,8 @@ func (w *World) RemoveEntity(e BasicEntity) {
 		sys.Remove(e)
 	}
 }
+
+// SortSystems sorts the systems in the world.
+func (w *World) SortSystems() {
+	sort.Sort(w.systems)
+}
