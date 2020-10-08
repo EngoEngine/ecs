@@ -1,6 +1,7 @@
 # ecs
 
-[![Build Status](https://travis-ci.org/EngoEngine/ecs.svg?branch=master)](https://travis-ci.org/EngoEngine/ecs)
+[![Build Status](https://github.com/EngoEngine/ecs/workflows/CI/badge.svg)](https://github.com/EngoEngine/ecs/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/EngoEngine/ecs)](https://goreportcard.com/report/github.com/EngoEngine/ecs)
 
 This is our implementation of the "Entity Component System" model in Go. It was designed to be used in `engo`, however
 it is not dependent on any other packages so is able to be used wherever!
@@ -65,7 +66,7 @@ type Prioritizer interface {
 ## Entities and Components
 Where do the entities come in? All game-logic has to be done within `System`s (the `Update` method, to be precise)). `Component`s store data (which is used by those `System`s). An `Entity` is no more than a wrapper which combines multiple `Component`s and adds a unique identifier to the whole. This unique identifier is nothing magic: simply an incrementing integer value - nothing to worry about.
 
-> Because the precise definition of those `Component`s can vary, this `ecs` package provides no `Component`s -- we only provide examples here. The `github.com/EngoEngine/engo/common` package offers lots of `Component`s and `System`s to work with, out of the box. 
+> Because the precise definition of those `Component`s can vary, this `ecs` package provides no `Component`s -- we only provide examples here. The `github.com/EngoEngine/engo/common` package offers lots of `Component`s and `System`s to work with, out of the box.
 
 Let's view an example:
 
