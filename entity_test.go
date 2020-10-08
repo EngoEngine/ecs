@@ -128,10 +128,6 @@ func (sys *MySystemTwo) AddByInterface(o Identifier) {
 	sys.Add(obj.GetBasicEntity(), obj.GetMyComponent2())
 }
 
-type BasicFace interface {
-	GetBasicEntity() *BasicEntity
-}
-
 type MyEntity1 struct {
 	BasicEntity
 	MyComponent1
