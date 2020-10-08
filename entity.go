@@ -133,3 +133,9 @@ func (is IdentifierSlice) Less(i, j int) bool {
 func (is IdentifierSlice) Swap(i, j int) {
 	is[i], is[j] = is[j], is[i]
 }
+
+// BasicFase is an interface that BasicEntity and entities containing
+// a BasicEntity implement.
+type BasicFace interface {
+	GetBasicEntity() *BasicEntity
+}
