@@ -218,7 +218,7 @@ The components need to have corresponding Getters and Interfaces in order to be 
 
 ```go
 func (a *ComponentA) GetComponentA() *ComponentA {
-    reurn a
+    return a
 }
 
 type AFace interface {
