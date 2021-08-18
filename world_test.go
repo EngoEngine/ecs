@@ -50,19 +50,26 @@ func (s *simpleSystem) AddByInterface(i Identifier) {
 	}
 }
 
-func (s *simpleSystem) Remove(b BasicEntity) {}
+func (s *simpleSystem) Remove(b BasicEntity) {
+	s.entities = nil
+}
 
 func (s *simpleSystem) Update(dt float32) {}
 
-func TestWorld_AddEntity(t *testing.T) {
+func TestWorld_AddRemoveEntity(t *testing.T) {
 
 	t.Run("works with multiple interfaces", func(t *testing.T) {
 		w := new(World)
 		sys := new(simpleSystem)
 		var face *BasicFace
-		w.AddEntity(&simpleEntity{NewBasic()})
+		ent := &simpleEntity{NewBasic()}
+		w.AddEntity(ent)
 		w.AddSystemInterface(sys, []interface{}{face}, nil)
 		if len(sys.entities) == 0 {
+			t.Error(len(sys.entities))
+		}
+		w.RemoveEntity(ent.BasicEntity)
+		if len(sys.entities) != 0 {
 			t.Error(len(sys.entities))
 		}
 	})
@@ -77,6 +84,20 @@ func TestWorld_AddEntity(t *testing.T) {
 			t.Error(len(sys.entities))
 		}
 	})
+
+	t.Run("add remove and does not add to system", func(t *testing.T) {
+		w := new(World)
+		sys := new(simpleSystem)
+		var face *BasicFace
+		ent := &simpleEntity{NewBasic()}
+		w.AddEntity(ent)
+		w.RemoveEntity(ent.BasicEntity)
+		w.AddSystemInterface(sys, []interface{}{face}, nil)
+		if len(sys.entities) != 0 {
+			t.Error(len(sys.entities))
+		}
+	})
+
 }
 
 type priorityChangeSystem struct {
