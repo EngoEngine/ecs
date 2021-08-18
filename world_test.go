@@ -56,32 +56,27 @@ func (s *simpleSystem) Update(dt float32) {}
 
 func TestWorld_AddEntity(t *testing.T) {
 
-	type args struct {
-		systems []SystemAddByInterfacer
-		e       Identifier
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{"works with multiple interfaces", args{
-			systems: []SystemAddByInterfacer{&simpleSystem{}},
-			e:       &simpleEntity{NewBasic()},
-		},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			w := new(World)
-			sys := new(simpleSystem)
-			var face *BasicFace
-			w.AddSystemInterface(sys, []interface{}{face}, nil)
-			w.AddEntity(tt.args.e)
-			if len(sys.entities) == 0 {
-				t.Error(len(sys.entities))
-			}
-		})
-	}
+	t.Run("works with multiple interfaces", func(t *testing.T) {
+		w := new(World)
+		sys := new(simpleSystem)
+		var face *BasicFace
+		w.AddEntity(&simpleEntity{NewBasic()})
+		w.AddSystemInterface(sys, []interface{}{face}, nil)
+		if len(sys.entities) == 0 {
+			t.Error(len(sys.entities))
+		}
+	})
+
+	t.Run("adds existing entity to system", func(t *testing.T) {
+		w := new(World)
+		sys := new(simpleSystem)
+		var face *BasicFace
+		w.AddSystemInterface(sys, []interface{}{face}, nil)
+		w.AddEntity(&simpleEntity{NewBasic()})
+		if len(sys.entities) == 0 {
+			t.Error(len(sys.entities))
+		}
+	})
 }
 
 type priorityChangeSystem struct {

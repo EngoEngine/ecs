@@ -1,4 +1,4 @@
-module github.com/EngoEngine/ecs
+module github.com/sardap/ecs
 
 go 1.14
 

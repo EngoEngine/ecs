@@ -10,6 +10,7 @@ import (
 type World struct {
 	systems      systems
 	sysIn, sysEx map[reflect.Type][]reflect.Type
+	entities     map[uint64]interface{}
 }
 
 // AddSystem adds the given System to the World, sorted by priority.
@@ -22,6 +23,16 @@ func (w *World) AddSystem(system System) {
 	sort.Sort(w.systems)
 }
 
+func search(i Identifier, types []reflect.Type) bool {
+	for _, t := range types {
+		if reflect.TypeOf(i).Implements(t) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // AddSystemInterface adds a system to the world, but also adds a filter that allows
 // automatic adding of entities that match the provided in interface, and excludes any
 // that match the provided ex interface, even if they also match in. in and ex must be
@@ -29,6 +40,9 @@ func (w *World) AddSystem(system System) {
 func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex interface{}) {
 	w.AddSystem(sys)
 
+	if w.entities == nil {
+		w.entities = make(map[uint64]interface{})
+	}
 	if w.sysIn == nil {
 		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
@@ -38,6 +52,20 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 	}
 	for _, v := range in.([]interface{}) {
 		w.sysIn[reflect.TypeOf(sys)] = append(w.sysIn[reflect.TypeOf(sys)], reflect.TypeOf(v).Elem())
+	}
+
+	for _, ent := range w.entities {
+		var i Identifier
+		var ok bool
+		if i, ok = ent.(Identifier); !ok {
+			break
+		}
+
+		if in, ok := w.sysIn[reflect.TypeOf(sys)]; ok {
+			if search(i, in) {
+				sys.AddByInterface(i)
+			}
+		}
 	}
 
 	if ex == nil {
@@ -60,6 +88,9 @@ func (w *World) AddSystemInterface(sys SystemAddByInterfacer, in interface{}, ex
 // AddSystemInterface. If the system was added via AddSystem the entity will not be
 // added to it.
 func (w *World) AddEntity(e Identifier) {
+	if w.entities == nil {
+		w.entities = make(map[uint64]interface{})
+	}
 	if w.sysIn == nil {
 		w.sysIn = make(map[reflect.Type][]reflect.Type)
 	}
@@ -67,14 +98,8 @@ func (w *World) AddEntity(e Identifier) {
 		w.sysEx = make(map[reflect.Type][]reflect.Type)
 	}
 
-	search := func(i Identifier, types []reflect.Type) bool {
-		for _, t := range types {
-			if reflect.TypeOf(i).Implements(t) {
-				return true
-			}
-		}
-		return false
-	}
+	w.entities[e.ID()] = e
+
 	for _, system := range w.systems {
 		sys, ok := system.(SystemAddByInterfacer)
 		if !ok {
@@ -86,10 +111,10 @@ func (w *World) AddEntity(e Identifier) {
 				continue
 			}
 		}
+
 		if in, ok := w.sysIn[reflect.TypeOf(sys)]; ok {
 			if search(e, in) {
 				sys.AddByInterface(e)
-				continue
 			}
 		}
 	}
@@ -113,6 +138,8 @@ func (w *World) RemoveEntity(e BasicEntity) {
 	for _, sys := range w.systems {
 		sys.Remove(e)
 	}
+
+	delete(w.entities, e.ID())
 }
 
 // SortSystems sorts the systems in the world.
