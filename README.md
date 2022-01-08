@@ -209,9 +209,9 @@ type MySystem struct {
     entities []mySystemEntity
 }
 
-type (m *MySystem) Add(basic ecs.BasicEntity, a *ComponentA) { /* Add stuff goes here */ }
-type (m *MySystem) Remove(basic ecs.BasicEntity) { /* Remove stuff here */ }
-type (m *MySystem) Update(dt float32) { /* Update stuff here */ }
+func (m *MySystem) Add(basic ecs.BasicEntity, a *ComponentA) { /* Add stuff goes here */ }
+func (m *MySystem) Remove(basic ecs.BasicEntity) { /* Remove stuff here */ }
+func (m *MySystem) Update(dt float32) { /* Update stuff here */ }
 ```
 
 The components need to have corresponding Getters and Interfaces in order to be utilized. Let's add them
