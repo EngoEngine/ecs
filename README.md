@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/EngoEngine/ecs/workflows/CI/badge.svg)](https://github.com/EngoEngine/ecs/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/EngoEngine/ecs)](https://goreportcard.com/report/github.com/EngoEngine/ecs)
+[![Go Reference](https://pkg.go.dev/badge/github.com/EngoEngine/ecs.svg)](https://pkg.go.dev/github.com/EngoEngine/ecs)
 
 This is our implementation of the "Entity Component System" model in Go. It was designed to be used in `engo`, however
 it is not dependent on any other packages so is able to be used wherever!
