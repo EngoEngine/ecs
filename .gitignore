@@ -23,7 +23,3 @@ _testmain.go
 *.test
 *.prof
 
-# Locally testing github actions
-node_modules/*
-package-lock.json
-package.json
