@@ -457,32 +457,90 @@ func BenchmarkIdiomatic(b *testing.B) {
 		sys12 := &MySystemOneTwo{}
 		w.AddSystem(sys12)
 
-		e1 := MyEntity1{}
-		e1.BasicEntity = NewBasic()
-
-		sys12.Add(&e1.BasicEntity, &e1.MyComponent1, nil)
-	}
-
-	Bench(b, preload, setup)
-}
-
-func BenchmarkIdiomaticDouble(b *testing.B) {
-	preload := func() {}
-	setup := func(w *World) {
-		sys12 := &MySystemOneTwo{}
-		w.AddSystem(sys12)
-
-		e12 := MyEntity12{}
-		e12.BasicEntity = NewBasic()
-
+		e12 := MyEntity12{BasicEntity: NewBasic()}
 		sys12.Add(&e12.BasicEntity, &e12.MyComponent1, &e12.MyComponent2)
 	}
 
-	Bench(b, preload, setup)
+	Bench(b, preload, setup, false, false, true)
+}
+
+func Benchmark10Systems10Entities(b *testing.B) {
+	BenchMultiples(b, 10, 10, false, false, true)
+}
+
+func Benchmark10Systems100Entities(b *testing.B) {
+	BenchMultiples(b, 10, 100, false, false, true)
+}
+
+func Benchmark10Systems1000Entities(b *testing.B) {
+	BenchMultiples(b, 10, 1000, false, false, true)
+}
+
+func Benchmark10Systems10000Entities(b *testing.B) {
+	BenchMultiples(b, 10, 10000, false, false, true)
+}
+
+func Benchmark100Systems10Entities(b *testing.B) {
+	BenchMultiples(b, 100, 10, false, false, true)
+}
+
+func Benchmark100Systems100Entities(b *testing.B) {
+	BenchMultiples(b, 100, 100, false, false, true)
+}
+
+func Benchmark100Systems1000Entities(b *testing.B) {
+	BenchMultiples(b, 100, 1000, false, false, true)
+}
+
+func Benchmark100Systems10000Entities(b *testing.B) {
+	BenchMultiples(b, 100, 10000, false, false, true)
+}
+
+func BenchmarkAddUpdate(b *testing.B) {
+	BenchMultiples(b, 100, 10000, true, false, true)
+}
+
+func BenchmarkAddInterfaceUpdate(b *testing.B) {
+	BenchMultiples(b, 100, 10000, true, true, false)
+}
+
+func BenchmarkRemoveUpdate(b *testing.B) {
+	BenchMultiples(b, 100, 10000, false, true, true)
+}
+
+func BenchmarkAddRemoveUpdate(b *testing.B) {
+	BenchMultiples(b, 100, 10000, true, true, true)
+}
+
+func BenchmarkAddInterfaceRemoveUpdate(b *testing.B) {
+	BenchMultiples(b, 100, 10000, true, true, false)
+}
+
+func BenchMultiples(b *testing.B, sysCount, entCount int, addDuringUpdate, removeDuringUpdate, addIdiomatic bool) {
+	preload := func() {}
+	setup := func(w *World) {
+		for i := 0; i < sysCount; i++ {
+			sys12 := &MySystemOneTwo{}
+			if addIdiomatic {
+				w.AddSystem(sys12)
+			} else {
+				var able *MySystemOneTwoable
+				var notable *NotMySystemOneTwoable
+				w.AddSystemInterface(sys12, able, notable)
+			}
+		}
+
+		for i := 0; i < entCount; i++ {
+			e12 := MyEntity12{BasicEntity: NewBasic()}
+			w.AddEntity(e12)
+		}
+	}
+
+	Bench(b, preload, setup, addDuringUpdate, removeDuringUpdate, addIdiomatic)
 }
 
 // Bench is a helper-function to easily benchmark one frame, given a preload / setup function
-func Bench(b *testing.B, preload func(), setup func(w *World)) {
+func Bench(b *testing.B, preload func(), setup func(w *World), addDuringUpdate, removeDuringUpdate, addIdiomatic bool) {
 	w := &World{}
 
 	preload()
@@ -492,6 +550,22 @@ func Bench(b *testing.B, preload func(), setup func(w *World)) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		w.Update(1 / 120) // 120 fps
+		e12 := MyEntity12{BasicEntity: NewBasic()}
+		if addDuringUpdate {
+			if addIdiomatic {
+				for _, system := range w.Systems() {
+					switch sys := system.(type) {
+					case *MySystemOneTwo:
+						sys.Add(e12.GetBasicEntity(), e12.GetMyComponent1(), e12.GetMyComponent2())
+					}
+				}
+			} else {
+				w.AddEntity(&e12)
+			}
+		}
+		if removeDuringUpdate {
+			w.RemoveEntity(e12.BasicEntity)
+		}
 	}
 }
 
