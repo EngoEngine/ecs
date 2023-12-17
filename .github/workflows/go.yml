@@ -72,7 +72,7 @@ jobs:
     - name: Comment coverage
       uses: zt4ff/auto-commenter@v2
       with:
-        type: Custom
+        type: custom
         body: |
           The test coverage was
           ${{ steps.readCoverage.outputs.content }}
