@@ -1,4 +1,5 @@
 # ecs
+![Coverage](https://img.shields.io/badge/Coverage-100.0%25-brightgreen)
 
 [![Build Status](https://github.com/EngoEngine/ecs/workflows/CI/badge.svg)](https://github.com/EngoEngine/ecs/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/EngoEngine/ecs)](https://goreportcard.com/report/github.com/EngoEngine/ecs)
