@@ -67,7 +67,7 @@ jobs:
         path: ./coverage.out
 
     - name: Comment coverage
-      uses: zt4ff/auto-commmenter@v2
+      uses: zt4ff/auto-commenter@v2
       with:
         type: Custom
         body: |
