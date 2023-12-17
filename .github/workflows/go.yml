@@ -21,6 +21,9 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
     - name: Get dependencies
       run: |
@@ -50,7 +53,6 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git pull
         git add README.md
         git commit -m "chore: Updated coverage badge."
 
