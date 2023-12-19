@@ -118,6 +118,7 @@ func main() {
 		log.Fatalf("Error waiting for git diff-index. Error was: %v", err.Error())
 	}
 	if coverMatch || svgMatch {
+		log.Print("here")
 		if err = commitToPR(); err != nil {
 			log.Fatalf("Unable to commit to PR. Error was: %v", err.Error())
 		}
@@ -132,6 +133,10 @@ func commitToPR() error {
 	}
 	gitEmail := exec.Command("git", "config", "--global", "email", "'coverageBot@users.noreply.github.com'")
 	if err = gitEmail.Run(); err != nil {
+		return err
+	}
+	gitRemote := exec.Command("git", "remote", "set-url", "origin", "https://x-access-token:"+os.GetEnv("GITHUB_TOKEN")+"@github.com/"+os.GetEnv("GITHUB_REPO"))
+	if err = gitRemote.Run(); err != nil {
 		return err
 	}
 	gitAddAll := exec.Command("git", "add", ".github/coverage.out", ".github/coverage.svg")
