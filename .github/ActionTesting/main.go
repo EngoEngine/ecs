@@ -105,11 +105,12 @@ func main() {
 	if err = checkForCoverageChanged.Start(); err != nil {
 		log.Fatalf("Unable to start git diff-index. Error was: %v", err.Error())
 	}
-	coverMatch, err := regexp.MatchReader(`\.github\/coverage.out`, gitOutput)
+	gitBytes, _ := io.ReadAll(gitOutput)
+	coverMatch, err := regexp.Match(`\.github\/coverage.out`, gitBytes)
 	if err != nil {
 		log.Fatalf("Unable to match git diff-index output with [[ coverage.out ]]. Error was: %v", err.Error())
 	}
-	svgMatch, err := regexp.MatchReader(`\.github\/coverage\.svg`, gitOutput)
+	svgMatch, err := regexp.Match(`\.github\/coverage\.svg`, gitBytes)
 	if err != nil {
 		log.Fatalf("Unable to match git diff-index output with [[ coverage.svg ]]. Error was: %v", err.Error())
 	}
