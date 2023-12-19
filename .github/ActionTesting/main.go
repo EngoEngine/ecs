@@ -97,7 +97,7 @@ func main() {
 		log.Fatalf("Unable to write to [[ .github/coverage.svg ]]. Error was: %v", err.Error())
 	}
 
-	checkForCoverageChanged := os.Command("git", "diff-index", "--cached", "HEAD")
+	checkForCoverageChanged := exec.Command("git", "diff-index", "--cached", "HEAD")
 	gitOutput, err := checkForSVGChanged.StdOutPipe()
 	if err != nil {
 		log.Fatalf("Unable to get stdout pipe for coverage changed command. Error was: %v", err.Error())
@@ -125,23 +125,23 @@ func main() {
 
 func commitToPR() error {
 	var err error
-	gitUName := os.Command("git", "config", "--global", "user.name", "'CoverageBot'")
+	gitUName := exec.Command("git", "config", "--global", "user.name", "'CoverageBot'")
 	if err = gitUName.Run(); err != nil {
 		return err
 	}
-	gitEMail := os.Command("git", "config", "--global", "email", "'coverageBot@users.noreply.github.com'")
+	gitEMail := exec.Command("git", "config", "--global", "email", "'coverageBot@users.noreply.github.com'")
 	if err = gitEmail.Run(); err != nil {
 		return err
 	}
-	gitAddAll := os.Command("git", "add", ".github/coverage.out", ".github/coverage.svg")
+	gitAddAll := exec.Command("git", "add", ".github/coverage.out", ".github/coverage.svg")
 	if err = gitAddAll.Run(); err != nil {
 		return err
 	}
-	gitCommit := os.Command("git", "commit", "-m", "'[[BOT]] Coverage changed. Updating badge and coverage output. [skip ci]'")
+	gitCommit := exec.Command("git", "commit", "-m", "'[[BOT]] Coverage changed. Updating badge and coverage output. [skip ci]'")
 	if err = gitCommit.Run(); err != nil {
 		return err
 	}
-	gitPush := os.Command("git", "push")
+	gitPush := exec.Command("git", "push")
 	if err = gitPush.Run(); err != nil {
 		return err
 	}
