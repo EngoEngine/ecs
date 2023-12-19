@@ -135,7 +135,7 @@ func commitToPR() error {
 	if err = gitEmail.Run(); err != nil {
 		return err
 	}
-	gitRemote := exec.Command("git", "remote", "set-url", "origin", "https://x-access-token:"+os.GetEnv("GITHUB_TOKEN")+"@github.com/"+os.GetEnv("GITHUB_REPO"))
+	gitRemote := exec.Command("git", "remote", "set-url", "origin", "https://x-access-token:"+os.Getenv("GITHUB_TOKEN")+"@github.com/"+os.Getenv("GITHUB_REPO"))
 	if err = gitRemote.Run(); err != nil {
 		return err
 	}
