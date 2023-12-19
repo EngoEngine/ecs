@@ -23,5 +23,3 @@ _testmain.go
 *.test
 *.prof
 
-# Locally testing github actions
-ActionTesting
