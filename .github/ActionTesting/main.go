@@ -25,7 +25,7 @@ func main() {
 		log.Fatalf("Unable to run go coverage tool. Error was: %v", err.Error())
 	}
 
-	output, err := os.Open("coverage.out")
+	output, err := os.Open(".github/coverage.out")
 	if err != nil {
 		log.Fatalf("Unable to open [[ coverage.out ]]. Error was: %v", err.Error())
 	}
