@@ -21,7 +21,6 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
-        ref: ${{ github.event.pull_request.head.ref }}
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get dependencies
