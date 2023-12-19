@@ -21,8 +21,7 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
-        token: ${{ secrets.GITHUB_TOKEN }}
-
+        
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
@@ -36,3 +35,5 @@ jobs:
         go build --tags=actiontesting -o=../../ActionTesting
         cd ../..
         ./ActionTesting
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
