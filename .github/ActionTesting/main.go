@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"log"
 	"net/http"
