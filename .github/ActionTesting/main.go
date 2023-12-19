@@ -131,7 +131,7 @@ func commitToPR() error {
 	if err = gitUName.Run(); err != nil {
 		return errors.New("Unable to set git username")
 	}
-	gitEmail := exec.Command("git", "config", "--global", "email", "'coverageBot@users.noreply.github.com'")
+	gitEmail := exec.Command("git", "config", "--global", "user.email", "'coverageBot@users.noreply.github.com'")
 	if err = gitEmail.Run(); err != nil {
 		return errors.New("Unable to set git email")
 	}
