@@ -97,7 +97,7 @@ func main() {
 		log.Fatalf("Unable to write to [[ .github/coverage.svg ]]. Error was: %v", err.Error())
 	}
 
-	checkForCoverageChanged := exec.Command("git", "ls-files", "--exclude-standard", "--others")
+	checkForCoverageChanged := exec.Command("git", "status", "--porcelain")
 	gitOutput, err := checkForCoverageChanged.StdoutPipe()
 	if err != nil {
 		log.Fatalf("Unable to get stdout pipe for coverage changed command. Error was: %v", err.Error())
@@ -118,7 +118,6 @@ func main() {
 		log.Fatalf("Error waiting for git diff-index. Error was: %v", err.Error())
 	}
 	if coverMatch || svgMatch {
-		log.Print("here")
 		if err = commitToPR(); err != nil {
 			log.Fatalf("Unable to commit to PR. Error was: %v", err.Error())
 		}
@@ -129,27 +128,27 @@ func commitToPR() error {
 	var err error
 	gitUName := exec.Command("git", "config", "--global", "user.name", "'CoverageBot'")
 	if err = gitUName.Run(); err != nil {
-		return err
+		return errors.New("Unable to set git username")
 	}
 	gitEmail := exec.Command("git", "config", "--global", "email", "'coverageBot@users.noreply.github.com'")
 	if err = gitEmail.Run(); err != nil {
-		return err
+		return errors.New("Unable to set git email")
 	}
 	gitRemote := exec.Command("git", "remote", "set-url", "origin", "https://x-access-token:"+os.Getenv("GITHUB_TOKEN")+"@github.com/"+os.Getenv("GITHUB_REPO"))
 	if err = gitRemote.Run(); err != nil {
-		return err
+		return errors.New("Unable to set remote url")
 	}
 	gitAddAll := exec.Command("git", "add", ".github/coverage.out", ".github/coverage.svg")
 	if err = gitAddAll.Run(); err != nil {
-		return err
+		return errors.New("Unable to git add")
 	}
 	gitCommit := exec.Command("git", "commit", "-m", "'[[BOT]] Coverage changed. Updating badge and coverage output. [skip ci]'")
 	if err = gitCommit.Run(); err != nil {
-		return err
+		return errors.New("Unable to run git commit")
 	}
 	gitPush := exec.Command("git", "push")
 	if err = gitPush.Run(); err != nil {
-		return err
+		return errors.New("Unable to run git push")
 	}
 	return nil
 }
