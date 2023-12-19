@@ -135,10 +135,6 @@ func commitToPR() error {
 	if err = gitEmail.Run(); err != nil {
 		return errors.New("Unable to set git email")
 	}
-	gitRemote := exec.Command("git", "remote", "set-url", "origin", "https://x-access-token:"+os.Getenv("GITHUB_TOKEN")+"@github.com/"+os.Getenv("GITHUB_REPO"))
-	if err = gitRemote.Run(); err != nil {
-		return errors.New("Unable to set remote url")
-	}
 	gitAddAll := exec.Command("git", "add", ".github/coverage.out", ".github/coverage.svg")
 	if err = gitAddAll.Run(); err != nil {
 		return errors.New("Unable to git add")
