@@ -98,7 +98,7 @@ func main() {
 	}
 
 	checkForCoverageChanged := exec.Command("git", "diff-index", "--cached", "HEAD")
-	gitOutput, err := checkForCoverageChanged.StdOutPipe()
+	gitOutput, err := checkForCoverageChanged.StdoutPipe()
 	if err != nil {
 		log.Fatalf("Unable to get stdout pipe for coverage changed command. Error was: %v", err.Error())
 	}
