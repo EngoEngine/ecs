@@ -26,6 +26,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Get dependencies
       run: |
@@ -40,6 +41,3 @@ jobs:
         go build --tags=actiontesting -o=../../ActionTesting
         cd ../..
         ./ActionTesting
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_REPO: ${{ github.repository }}
