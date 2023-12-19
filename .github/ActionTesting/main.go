@@ -20,7 +20,7 @@ func main() {
 		log.Fatalf("Unable to run go test. Error was: %v", err.Error())
 	}
 
-	cover := exec.Command("go", "tool", "cover", "--func=coverage.out", "-o=.github/coverage.out")
+	cover := exec.Command("go", "tool", "cover", "--func=.github/coverage.out", "-o=.github/coverage.out")
 	if err = cover.Run(); err != nil {
 		log.Fatalf("Unable to run go coverage tool. Error was: %v", err.Error())
 	}
