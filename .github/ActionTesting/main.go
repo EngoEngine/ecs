@@ -97,7 +97,7 @@ func main() {
 		log.Fatalf("Unable to write to [[ .github/coverage.svg ]]. Error was: %v", err.Error())
 	}
 
-	checkForCoverageChanged := exec.Command("git", "diff-index", "--cached", "HEAD")
+	checkForCoverageChanged := exec.Command("git", "ls-files", "--exclude-standard", "--others")
 	gitOutput, err := checkForCoverageChanged.StdoutPipe()
 	if err != nil {
 		log.Fatalf("Unable to get stdout pipe for coverage changed command. Error was: %v", err.Error())
