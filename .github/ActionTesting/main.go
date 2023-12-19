@@ -98,7 +98,7 @@ func main() {
 	}
 
 	checkForCoverageChanged := exec.Command("git", "diff-index", "--cached", "HEAD")
-	gitOutput, err := checkForSVGChanged.StdOutPipe()
+	gitOutput, err := checkForCoverageChanged.StdOutPipe()
 	if err != nil {
 		log.Fatalf("Unable to get stdout pipe for coverage changed command. Error was: %v", err.Error())
 	}
@@ -116,7 +116,7 @@ func main() {
 	if err = checkForCoverageChanged.Wait(); err != nil {
 		log.Fatalf("Error waiting for git diff-index. Error was: %v", err.Error())
 	}
-	if coverMath || svgMatch {
+	if coverMatch || svgMatch {
 		if err = commitToPR(); err != nil {
 			log.Fatalf("Unable to commit to PR. Error was: %v", err.Error())
 		}
@@ -129,7 +129,7 @@ func commitToPR() error {
 	if err = gitUName.Run(); err != nil {
 		return err
 	}
-	gitEMail := exec.Command("git", "config", "--global", "email", "'coverageBot@users.noreply.github.com'")
+	gitEmail := exec.Command("git", "config", "--global", "email", "'coverageBot@users.noreply.github.com'")
 	if err = gitEmail.Run(); err != nil {
 		return err
 	}
@@ -145,4 +145,5 @@ func commitToPR() error {
 	if err = gitPush.Run(); err != nil {
 		return err
 	}
+	return nil
 }
