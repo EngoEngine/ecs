@@ -139,7 +139,7 @@ func commitToPR() error {
 	if err = gitAddAll.Run(); err != nil {
 		return errors.New("Unable to git add")
 	}
-	gitCommit := exec.Command("git", "commit", "-m", "'[[BOT]] Coverage changed. Updating badge and coverage output. [skip ci]'")
+	gitCommit := exec.Command("git", "commit", "-m", "'[[BOT]] Coverage changed. Updating badge and coverage output.'")
 	if err = gitCommit.Run(); err != nil {
 		return errors.New("Unable to run git commit")
 	}
